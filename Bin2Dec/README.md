@@ -1,9 +1,13 @@
 # Especificación de Requisitos de Software (SRS)
 
 **Proyecto:** Bin2Dec - Conversor de Binario a Decimal (Arquitectura Cliente-Servidor)
+
 **Autor:** Juan David Villegas Anaya
+
 **Organización:** ...
+
 **Fecha:** Noviembre 2026
+
 **Versión:** 1.2
 
 ---
@@ -246,5 +250,5 @@ Los mensajes de error de la API están en la sección 5.4. Los mensajes que gene
 | Situación | Mensaje | Requisito |
 | :--- | :--- | :--- |
 | Se eliminó un carácter distinto de 0 o 1 | Solo se permiten los dígitos 0 y 1. | RF-04 |
-| Se truncó la entrada a 8 caracteres | Mensaje | RF-04, RF-13 |
+| Se truncó la entrada a 8 caracteres | La longitud máxima es de 8 dígitos. | RF-04, RF-13 |
 | Falla de red, 5xx, timeout o CORS | Servidor no disponible en este momento. | RF-10 |
