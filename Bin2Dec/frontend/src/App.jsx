@@ -24,6 +24,10 @@ function App() {
       errorMessage = 'La longitud máxima es de 8 dígitos.';
     }
 
+    if (valorFinalLimpio !== binary && decimal !== null) {
+      setDecimal(null);
+    }
+
     setBinary(valorFinalLimpio);
     setErrorMessage(errorMessage);
   };
