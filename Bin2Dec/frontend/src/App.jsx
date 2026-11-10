@@ -4,6 +4,7 @@ import { ConverterForm } from './components/ConverterForm'
 import { AlertMessage } from './components/AlertMessage'
 import { ResultDisplay } from './components/ResultDisplay'
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
 
 function App() {
   const [binary, setBinary] = useState('');
@@ -36,7 +37,7 @@ function App() {
       setIsLoading(true);
       try {
         // 1. fetch con await
-        const response = await fetch(`http://localhost:8080/api/v1/convert?binary=${binary}`, {
+        const response = await fetch(`${API_BASE_URL}/api/v1/convert?binary=${binary}`, {
           signal: AbortSignal.timeout(3000) // Timeout de 3s
         });
 

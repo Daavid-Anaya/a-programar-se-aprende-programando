@@ -12,7 +12,7 @@ import com.bin2dec.backend.service.ConverterService;
 
 @RestController 
 @RequestMapping("/api/v1")
-@CrossOrigin(origins = {"http://localhost:5173", "http://localhost:3000"})
+@CrossOrigin(origins = "${app.cors.allowed-origins}")
 public class ConverterController {
     private final ConverterService converterService;
 
