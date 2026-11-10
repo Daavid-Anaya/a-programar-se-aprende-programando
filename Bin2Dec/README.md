@@ -38,7 +38,7 @@ Los términos técnicos están en el Apéndice 8.1. Los principales: Frontend (c
 ### 2.1 Perspectiva del Producto
 El sistema se compone de dos módulos independientes que se comunican con peticiones HTTP asíncronas:
 * **Cliente web:**  React, con una arquitectura modular basada en componentes y estilos en CSS.
-* **Servidor (API):** Java con Spring Boot 3.x, que expone la lógica de conversión mediante controladores web.
+* **Servidor (API):** Java con Spring Boot 4.x, que expone la lógica de conversión mediante controladores web.
 
 ### 2.2 Funciones principales
 * Captura de secuencias binarias mediante un formulario web.
@@ -52,7 +52,7 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 
 ### 2.4 Entorno Operativo
 *   **Cliente:** navegador web moderno con JavaScript habilitado (Chrome, Firefox, Edge y Safari, en sus dos últimas versiones principales).
-*   **Servidor:** Java 17 o superior (JRE/JDK), requisito de Spring Boot 3.x.
+*   **Servidor:** Java 21 o superior (JRE/JDK), requisito de Spring Boot 4.x.
 
 ### 2.5 Restricciones de diseño
 * El cliente se desarrolla con React (componentes funcionales), CSS y JavaScript.
@@ -64,11 +64,12 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 ### 2.6 Suposiciones y dependencias
 * El navegador del usuario tiene JavaScript habilitado.
 * El cliente web puede alcanzar el servidor por red; por defecto el servidor escucha en el puerto 8080.
-* Dependencias del servidor: Spring Boot 3.x para la API y JUnit para las pruebas unitarias.
+* Dependencias del servidor: Spring Boot 4.x para la API y JUnit para las pruebas unitarias.
 * Dependencias del cliente: React y su herramienta de compilación (por ejemplo, Vite), con Node.js y npm para el desarrollo.
 
-### 2.6 Casos de Uso
+### 2.7 Casos de Uso
 | ID | Nombre | Tipo | Descripción |
+| :--- | :--- | :--- | :--- |
 | CU-01 | Conversión exitosa | Principal | El usuario ingresa un binario válido (ej. 1011), pulsa "Convertir" o Enter, el cliente llama a la API y se muestra el resultado (11). |
 | CU-02 | Entrada inválida en la UI | Alterno | El usuario teclea "A", pega "102" o arrastra texto no binario. La UI elimina los caracteres inválidos y muestra una alerta visual inmediata. |
 | CU-03 | Falla de red o servidor | Alterno | El servidor está caído, responde con error 5xx o tarda más de 3 s. La UI muestra "Servidor no disponible en este momento.". |
@@ -88,14 +89,14 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 | **RF-06a** | **API: vacío o ausente** | El backend debe responder HTTP 400 con `ERR_EMPTY` cuando el parámetro `binary` no se envíe o sea una cadena vacía. |
 | **RF-06b** | **API: longitud** | El backend debe responder HTTP 400 con `ERR_LENGTH` cuando la cadena tenga más de 8 caracteres. La longitud mínima de 1 queda cubierta por RF-06a. |
 | **RF-06c** | **API: caracteres** | El backend debe responder HTTP 400 con `ERR_CHARS` cuando la cadena contenga caracteres distintos de `0` y `1`. |
-| **RF-07** | **Preservación de Ceros** | Los ceros a la izquierda (ej. `0011`) son válidos. Se procesan matemáticamente y se devuelven sin modificar en el campo `originalBinary` |
+| **RF-07** | **Preservación de Ceros** | Los ceros a la izquierda (ej. `0011`) son válidos. Se procesan matemáticamente y se devuelven sin modificar en el campo `binary` |
 | **RF-08** | **Cálculo de Conversión** | El backend debe convertir la cadena base 2 a un entero base 10 recorriendo la cadena y sumando las potencias de 2 correspondientes (Apéndice 8.2). |
 | **RF-09** | **Renderizado de Éxito** | El cliente debe interpretar el JSON de éxito y mostrar el valor decimal en el área de resultado. |
 | **RF-10** | **Manejo de Errores de Red** | Si la petición falla por HTTP 5xx, por tiempo de espera superior a 3 s, por error de red o por bloqueo CORS, el cliente debe mostrar el mensaje "Servidor no disponible en este momento.". |
-| **RF-10** | **Precedencia de validaciones** | Si una entrada incumple varias reglas, el backend devuelve solo un error, en este orden: `ERR_EMPTY`, luego `ERR_CHARS`, luego `ERR_LENGTH`. |
-| **RF-10** | **Errores 400 en el cliente** | Si la API responde HTTP 400, el cliente debe mostrar el campo `message` de la respuesta en el contenedor de alertas. |
-| **RF-10** | **Límite de longitud en la UI** | El campo de entrada no debe admitir más de 8 caracteres. Al pegar o soltar un texto más largo, la UI conserva solo los primeros 8 caracteres válidos. | 
-| **RF-10** | **Códigos de estado HTTP** | El backend responde 200 en éxito, 400 por entrada inválida, 405 para métodos distintos de `GET` y 500 con `ERR_INTERNAL` ante excepciones no controladas, sin exponer trazas internas. |
+| **RF-11** | **Precedencia de validaciones** | Si una entrada incumple varias reglas, el backend devuelve solo un error, en este orden: `ERR_EMPTY`, luego `ERR_CHARS`, luego `ERR_LENGTH`. |
+| **RF-12** | **Errores 400 en el cliente** | Si la API responde HTTP 400, el cliente debe mostrar el campo `message` de la respuesta en el contenedor de alertas. |
+| **RF-13** | **Límite de longitud en la UI** | El campo de entrada no debe admitir más de 8 caracteres. Al pegar o soltar un texto más largo, la UI conserva solo los primeros 8 caracteres válidos. | 
+| **RF-14** | **Códigos de estado HTTP** | El backend responde 200 en éxito, 400 por entrada inválida, 405 para métodos distintos de `GET` y 500 con `ERR_INTERNAL` ante excepciones no controladas, sin exponer trazas internas. |
 
 ---
 
@@ -125,7 +126,7 @@ La pantalla principal es minimalista e incluye:
 * Un contenedor de visibilidad dinámica para advertencias de validación y errores (RF-04, RF-10, RF-12).
 
 ### 5.2 Interfaces de software
-El cliente React consume la API del servidor con la función `fetch` del navegador. El servidor es una aplicación Spring Boot 3.x que se ejecuta en Java 17 o superior. No hay otras integraciones.
+El cliente React consume la API del servidor con la función `fetch` del navegador. El servidor es una aplicación Spring Boot 3.x que se ejecuta en Java 21 o superior. No hay otras integraciones.
 
 ### 5.3 Interfaces de comunicaciones
 Protocolo HTTP (HTTPS en producción), formato JSON codificado en UTF-8. El servidor escucha por defecto en el puerto 8080 y aplica la política CORS de RNF-03. Las peticiones del cliente tienen un tiempo de espera de 3 s (RF-10).
@@ -137,17 +138,17 @@ Se usa **GET** porque la operación solo lee y calcula: es segura (no modifica e
 * Endpoint: `GET /api/v1/convert`
 * Parámetro de consulta: `binary` (cadena), por ejemplo `?binary=1011`
 
-**Respuestas Exitosas (Status 200 OK): `originalBinary` devuelve la entrada sin modificar (RF-07)**
+**Respuestas Exitosas (Status 200 OK): `binary` devuelve la entrada sin modificar (RF-07)**
 ```json
 {
   "decimal": 11,
-  "originalBinary": "1011"
+  "binary": "1011"
 }
 ```
 
 Respuestas de error. Todas usan el formato `{"errorCode": "...", "message": "..."}`. Si una entrada incumple varias reglas se devuelve un solo error, según la precedencia de RF-11.
 
-**Respuestas de Error (Status 400 Bad Request):**
+**Respuestas de error:**
 | HTTP | `errorCode` | Cuándo ocurre | `message` |
 | :--- | :--- | :--- | :--- |
 | 400 | `ERR_EMPTY` | Falta `binary` o está vacío | La entrada no puede estar vacía. |
@@ -167,7 +168,7 @@ El sistema se acepta cuando los 21 casos siguientes pasan. Cada requisito funcio
 | **CP-01** | Conversión normal | `1010` + Click botón | LA UI muestra `10`. HTTP 200. | RF-01, RF-08, RF-09 |
 | **CP-02** | Límite superior | `11111111` | La UI muestra `255`. HTTP 200. | RF-08 |
 | **CP-03** | Límite inferior | `0` | La UI muestra `0`. HTTP 200. | RF-08 |
-| **CP-04** | Ceros a la izquierda | `0011` | La UI muestra `3`. El JSON devuelve `originalBinary": 0011`. | RF-07 |
+| **CP-04** | Ceros a la izquierda | `0011` | La UI muestra `3`. El JSON devuelve `"binary": "0011"`. | RF-07 |
 | **CP-05** | Tecla Enter | `11` + `Enter` | La UI muestra `3`. | RF-02 |
 | **CP-06** | Tecleo inválido | Teclear `A` en el campo vacío | El campo sigue vacío y aparece la advertencia roja | RF-03, RF-04 |
 | **CP-07** | Pegado inválido | Pegar `1021` | El campo queda en `101` y aparece la advertencia. | RF-03, RF-04 |
@@ -180,7 +181,7 @@ El sistema se acepta cuando los 21 casos siguientes pasan. Cada requisito funcio
 | **CP-14** | API: longitud excedida | `?binary=100000000` | HTTP 400. `ERR_LENGTH` | RF-06b |
 | **CP-15** | API: caracteres inválidos | `?binary=101a` y `?binary=102` | HTTP 400. `ERR_CHARS` en ambos. | RF-06c |
 | **CP-16** | API: precedencia | `?binary=1021111111` (10 caracteres, uno inválido) | HTTP 400. `ERR_CHARS` (no `ERR_LENGTH`) | RF-11 |
-| **CP-17** | API: método no permitido | `POST /api/v1/convert?binary=11` | HTTP 400. `ERR_METHOD` | RF-14 |
+| **CP-17** | API: método no permitido | `POST /api/v1/convert?binary=11` | HTTP 405. `ERR_METHOD` | RF-14 |
 | **CP-18** | Error 400 en el cliente | API simulada que responde 400 con `ERR_CHARS` | El contenedor de alertas muestra el `message` recibido. | RF-12 |
 | **CP-19** | Servidor apagado | Servidor detenido; `101` + "Convertir" | La UI muestra "Servidor no disponible en este momento.". | RF-10 |
 | **CP-20** | Error 500 | API simulada que responde 500 con `ERR_INTERNAL` | La UI muestra "Servidor no disponible en este momento.". | RF-10, RF-14 |
