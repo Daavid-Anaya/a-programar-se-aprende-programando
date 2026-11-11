@@ -109,7 +109,7 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 | **RNF-03** | **CORS** | El backend debe aplicar una política CORS restrictiva con orígenes permitidos configurables fuera del código. En desarrollo: `http://localhost:3000` y `http://localhost:5173`. En producción: solo el origen del cliente desplegado. Nunca se usa el comodín *. |
 | **RNF-04** | **Accesibilidad (a11y)** | El `<input>` debe tener una etiqueta `<label>` vinculada, el texto debe tener un contraste mínimo de 4.5:1 (WCAG 2.1, criterio 1.4.3), toda la interfaz debe poder usarse con teclado y el resultado y las alertas deben anunciarse a lectores de pantalla (`aria-live`). |
 | **RNF-05** | **Compatibilidad** | La UI debe funcionar sin errores en las dos últimas versiones principales de Chrome, Firefox, Edge y Safari. |
-| **RNF-06** | **Pruebas** | La lógica de conversión y validación en Java debe tener al menos 80 % de cobertura con pruebas unitarias (JUnit), incluidos los casos límite: `0`, `11111111`, vacío, 9 bits y caracteres inválidos. |
+| **RNF-06** | **Pruebas** | La lógica de conversión y validación en Java debe verificarse mediante pruebas unitarias (JUnit), incluidos los casos límite: `0`, `11111111`, vacío, 9 bits y caracteres inválidos. |
 | **RNF-07** | **Seguridad de transporte y de contenido** | En producción, cliente y API se sirven por HTTPS. El cliente trata la entrada y las respuestas siempre como texto (`interpolación JSX`, nunca `dangerouslySetInnerHTML`). Los mensajes de error no exponen información interna del servidor. |
 | **RNF-08** | **Separación de capas** | El layout y la manipulación del DOM se resuelven solo en el cliente React (componentes, CSS y JavaScript); el procesamiento de negocio ocurre solo en Java. |
 
@@ -126,7 +126,7 @@ La pantalla principal es minimalista e incluye:
 * Un contenedor de visibilidad dinámica para advertencias de validación y errores (RF-04, RF-10, RF-12).
 
 ### 5.2 Interfaces de software
-El cliente React consume la API del servidor con la función `fetch` del navegador. El servidor es una aplicación Spring Boot 3.x que se ejecuta en Java 21 o superior. No hay otras integraciones.
+El cliente React consume la API del servidor con la función `fetch` del navegador. El servidor es una aplicación Spring Boot 4.x que se ejecuta en Java 21 o superior. No hay otras integraciones.
 
 ### 5.3 Interfaces de comunicaciones
 Protocolo HTTP (HTTPS en producción), formato JSON codificado en UTF-8. El servidor escucha por defecto en el puerto 8080 y aplica la política CORS de RNF-03. Las peticiones del cliente tienen un tiempo de espera de 3 s (RF-10).
@@ -210,7 +210,7 @@ El sistema se acepta cuando los 21 casos siguientes pasan. Cada requisito funcio
 | RNF-03 CORS | PNF-03 | Petición con un origen permitido (la respuesta incluye `Access-Control-Allow-Origin`) y con un origen no listado (el navegador la bloquea); revisión de la configuración. |
 | RNF-04 Accesibilidad | PNF-04 | Auditoría con Lighthouse o axe, medición de contraste, recorrido completo con la tecla `Tab` y prueba con un lector de pantalla. |
 | RNF-05 Compatibilidad | PNF-05 | Ejecutar CP-01 a CP-11 en las dos últimas versiones de Chrome, Firefox, Edge y Safari. |
-| RNF-06 Pruebas | PNF-06 | Informe de cobertura (por ejemplo JaCoCo) con 80 % o más en la lógica de conversión y validación. |
+| RNF-06 Pruebas | PNF-06 | Ejecución de pruebas unitarias con JUnit para los casos de conversión, validación y límites definidos en RNF-06. |
 | RNF-07 Seguridad de transporte y de contenido | PNF-07 | Revisión de que el cliente no usa `dangerouslySetInnerHTML`, comprobación de HTTPS en el despliegue y de que una respuesta 500 no incluye trazas. |
 | RNF-08 Separación de capas | PNF-08 | Revisión de código: sin lógica de conversión en JavaScript ni manipulación del DOM en Java. |
 
