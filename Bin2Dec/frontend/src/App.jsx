@@ -3,6 +3,7 @@ import './App.css'
 import { ConverterForm } from './components/ConverterForm'
 import { AlertMessage } from './components/AlertMessage'
 import { ResultDisplay } from './components/ResultDisplay'
+import { BitViewer } from './components/BitViewer'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080'
 
@@ -63,8 +64,9 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Hello, Bin2Dec!</h1>
+      <h1>Bin2Dec</h1>
       <ConverterForm value={binary} onChange={handleBinaryChange} onSubmit={handleSubmit} isLoading={isLoading} />
+      <BitViewer value={binary} onChange={handleBinaryChange} disabled={isLoading} />
       <AlertMessage message={errorMessage} />
       <ResultDisplay decimal={decimal} />
     </div>
