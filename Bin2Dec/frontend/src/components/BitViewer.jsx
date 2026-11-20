@@ -19,15 +19,15 @@ export function BitViewer ({ value, onChange, disabled}) {
                     key={position}
                     type="button"
                     className={`bit-card${isActive ? ' bit-card--active' : ''}`}
-                    aria-label={`Bit ${position}`}
+                    aria-label={`Bit ${position}, valor ${2 ** position}`}
                     aria-pressed={isActive}
                     disabled={disabled}
                     onClick={() => toggleBit(index)}
                 >
-                    <span>Bit {position}</span>
-                    <span>2<sup>{position}</sup></span>
-                    <strong>{bit}</strong>
-                    <span>{2 ** position}</span>
+                    <span className="bit-card__label">Bit {position}</span>
+                    <span className="bit-card__power">2<sup>{position}</sup></span>
+                    <strong className="bit-card__value">{bit}</strong>
+                    <span className="bit-card__weight">{2 ** position}</span>
                 </button>
                 );
             })}

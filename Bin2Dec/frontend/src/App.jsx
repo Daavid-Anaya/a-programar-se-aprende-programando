@@ -63,13 +63,31 @@ function App() {
     };
 
   return (
-    <div className="App">
-      <h1>Bin2Dec</h1>
-      <ConverterForm value={binary} onChange={handleBinaryChange} onSubmit={handleSubmit} isLoading={isLoading} />
-      <BitViewer value={binary} onChange={handleBinaryChange} disabled={isLoading} />
-      <AlertMessage message={errorMessage} />
-      <ResultDisplay decimal={decimal} />
-    </div>
+    <main className="app">
+      <header className="app-header">
+        <h1 className="app-title" translate="no">Bin2Dec</h1>
+        <p className="app-subtitle">Conversor de binario a decimal · 8 bits</p>
+      </header>
+
+      <section className="panel" aria-labelledby="input-title">
+        <h2 id="input-title" className="panel-title">Entrada</h2>
+        <ConverterForm value={binary} onChange={handleBinaryChange} onSubmit={handleSubmit} isLoading={isLoading} />
+        <AlertMessage message={errorMessage} />
+      </section>
+
+      <section className="panel" aria-labelledby="bits-title">
+        <div className="panel-heading">
+          <h2 id="bits-title" className="panel-title">Registro de bits</h2>
+          <p className="panel-hint">Seleccione un bit para alternarlo entre 0 y 1.</p>
+        </div>
+        <BitViewer value={binary} onChange={handleBinaryChange} disabled={isLoading} />
+      </section>
+
+      <section className="panel panel--result" aria-labelledby="result-title">
+        <h2 id="result-title" className="panel-title">Salida</h2>
+        <ResultDisplay decimal={decimal} />
+      </section>
+    </main>
   )
 }
 

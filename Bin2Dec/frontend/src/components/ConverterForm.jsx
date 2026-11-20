@@ -8,20 +8,29 @@ export function ConverterForm({value, onChange, onSubmit, isLoading}) {
     } 
 
     return (
-        <form onSubmit={ejecutarEnvio}>
-            <label htmlFor="binary-input">Número Binario</label>
-            <input
-                id="binary-input"
-                type="text"
-                value={value}
-                onChange={(e) => onChange(e.target.value)} // Pasa el valor del input al componente padre
-                placeholder = "Ingrese un número binario"
-                disabled={isLoading} // Se deshabilita el input mientras se está cargando la conversión
-            />
+        <form className="converter-form" onSubmit={ejecutarEnvio}>
+            <label className="field-label" htmlFor="binary-input">Número Binario</label>
+            <div className="field-row">
+                <input
+                    id="binary-input"
+                    className="binary-input"
+                    name="binary"
+                    type="text"
+                    inputMode="numeric" // Teclado numérico en móviles
+                    autoComplete="off"
+                    spellCheck={false}
+                    aria-describedby="binary-help"
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)} // Pasa el valor del input al componente padre
+                    placeholder = "Ej. 10110101…"
+                    disabled={isLoading} // Se deshabilita el input mientras se está cargando la conversión
+                />
 
-            <button type="submit" disabled={isLoading || estaVacio}>
-                {isLoading ? "Convirtiendo..." : "Convertir"}
-            </button>
+                <button className="convert-button" type="submit" disabled={isLoading || estaVacio}>
+                    {isLoading ? "Convirtiendo…" : "Convertir"}
+                </button>
+            </div>
+            <p id="binary-help" className="field-help">Solo dígitos 0 y 1, hasta 8 dígitos.</p>
         </form>
     );
 }
