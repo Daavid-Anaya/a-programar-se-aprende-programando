@@ -6,7 +6,7 @@ Repositorio de práctica de desarrollo backend y frontend. Contiene proyectos in
 
 | Proyecto | Nivel | Frontend | Backend | Estado |
 |----------|-------|----------|---------|--------|
-| [Bin2Dec](./Bin2Dec/README.md) — conversor de binario a decimal de hasta 8 bits | Principiante | React 19 + Vite | Java 21 + Spring Boot 4 | En progreso |
+| [Bin2Dec](./Bin2Dec/README.md) — conversor de binario a decimal de hasta 8 bits | Principiante | React 19 + Vite | Java 21 + Spring Boot 4 | Completado |
 
 ## Niveles
 
