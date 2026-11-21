@@ -8,7 +8,7 @@
 
 **Fecha:** Noviembre 2026
 
-**Versión:** 1.2
+**Versión:** 1.3
 
 ---
 
@@ -27,6 +27,7 @@ Para esta iteración, no se contemplan:
 * Soporte para cadenas mayores a 8 bits.
 * Persistencia de datos en base de datos.
 * Autenticación o autorización de usuarios.
+* Despliegue a producción. El cliente y el servidor se ejecutan solo en el entorno local de desarrollo.
 
 ### 1.4 Definiciones y Acrónimos
 Los términos técnicos están en el Apéndice 8.1. Los principales: Frontend (capa de presentación), Backend (capa de lógica en el servidor), API REST (interfaz basada en HTTP), Bit (unidad mínima de información, 0 o 1) y CORS (Cross-Origin Resource Sharing, mecanismo que permite a una página web solicitar recursos de otro origen).
@@ -43,6 +44,7 @@ El sistema se compone de dos módulos independientes que se comunican con petici
 ### 2.2 Funciones principales
 * Captura de secuencias binarias mediante un formulario web.
 * Validación en tiempo real que elimina caracteres inválidos (letras, dígitos mayores que 1, símbolos) y limita la longitud a 8 caracteres.
+* Visualización y edición de la cadena bit a bit mediante un visor de 8 bits sincronizado con el formulario.
 * Envío de la cadena al servidor mediante una API.
 * Revalidación y conversión matemática en el backend.
 * Visualización del resultado decimal o de mensajes de error sin recargar la página.
@@ -74,6 +76,7 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 | CU-02 | Entrada inválida en la UI | Alterno | El usuario teclea "A", pega "102" o arrastra texto no binario. La UI elimina los caracteres inválidos y muestra una alerta visual inmediata. |
 | CU-03 | Falla de red o servidor | Alterno | El servidor está caído, responde con error 5xx o tarda más de 3 s. La UI muestra "Servidor no disponible en este momento.". |
 | CU-04 | Consumo directo de la API | Alterno | Un cliente distinto de la UI envía una entrada vacía, demasiado larga o con caracteres inválidos. El servidor responde HTTP 400 con el código de error correspondiente. |
+| CU-05 | Edición bit a bit | Alterno | El usuario forma la cadena pulsando los bits del visor (ej. bits 3, 1 y 0). El campo de texto se actualiza con `00001011` y, al pulsar "Convertir", se muestra el resultado (11). |
 
 ---
 
@@ -97,6 +100,8 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 | **RF-12** | **Errores 400 en el cliente** | Si la API responde HTTP 400, el cliente debe mostrar el campo `message` de la respuesta en el contenedor de alertas. |
 | **RF-13** | **Límite de longitud en la UI** | El campo de entrada no debe admitir más de 8 caracteres. Al pegar o soltar un texto más largo, la UI conserva solo los primeros 8 caracteres válidos. | 
 | **RF-14** | **Códigos de estado HTTP** | El backend responde 200 en éxito, 400 por entrada inválida, 405 para métodos distintos de `GET` y 500 con `ERR_INTERNAL` ante excepciones no controladas, sin exponer trazas internas. |
+| **RF-15** | **Visor de bits** | La UI debe mostrar un visor de 8 bits (posiciones 7 a 0) que refleje en todo momento el contenido del campo de texto, completado con ceros a la izquierda hasta 8 bits. Cada bit muestra su posición, la potencia de 2 y su valor decimal. El visor no calcula el resultado: la conversión ocurre solo en el backend (RNF-08). |
+| **RF-16** | **Edición bit a bit** | Al pulsar un bit del visor, este alterna entre `0` y `1`, y el campo de texto se actualiza con la cadena completa de 8 dígitos, incluidos los ceros a la izquierda. El cambio se procesa igual que una entrada en el campo: oculta la advertencia de RF-04 y, si la cadena cambia, borra el resultado decimal mostrado. Los bits se deshabilitan mientras hay una conversión en curso. |
 
 ---
 
@@ -106,11 +111,11 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 | :--- | :--- | :--- |
 | **RNF-01** | **Validación duplicada** | La validación existe duplicada **a propósito**: en el frontend por usabilidad (evita peticiones inválidas) y en el backend por seguridad (la API puede recibir peticiones directas sin pasar por la UI). El backend nunca debe confiar en la validación del cliente. |
 | **RNF-02** | **Rendimiento** | El percentil 95 del tiempo de respuesta de la API no debe exceder 300 ms. Se mide con 1,000 peticiones válidas secuenciales, después de 100 de calentamiento, con cliente y servidor en la misma máquina de referencia (procesador i5, 8 GB de RAM). |
-| **RNF-03** | **CORS** | El backend debe aplicar una política CORS restrictiva con orígenes permitidos configurables fuera del código. En desarrollo: `http://localhost:3000` y `http://localhost:5173`. En producción: solo el origen del cliente desplegado. Nunca se usa el comodín *. |
-| **RNF-04** | **Accesibilidad (a11y)** | El `<input>` debe tener una etiqueta `<label>` vinculada, el texto debe tener un contraste mínimo de 4.5:1 (WCAG 2.1, criterio 1.4.3), toda la interfaz debe poder usarse con teclado y el resultado y las alertas deben anunciarse a lectores de pantalla (`aria-live`). |
+| **RNF-03** | **CORS** | El backend debe aplicar una política CORS restrictiva con orígenes permitidos configurables fuera del código. Por defecto, se permiten `http://localhost:3000` y `http://localhost:5173`. Nunca se usa el comodín *. |
+| **RNF-04** | **Accesibilidad (a11y)** | El `<input>` debe tener una etiqueta `<label>` vinculada, el texto debe tener un contraste mínimo de 4.5:1 (WCAG 2.1, criterio 1.4.3), toda la interfaz debe poder usarse con teclado, el resultado y las alertas deben anunciarse a lectores de pantalla (`aria-live`) y los bits del visor deben exponer su estado (`aria-pressed`). |
 | **RNF-05** | **Compatibilidad** | La UI debe funcionar sin errores en las dos últimas versiones principales de Chrome, Firefox, Edge y Safari. |
 | **RNF-06** | **Pruebas** | La lógica de conversión y validación en Java debe verificarse mediante pruebas unitarias (JUnit), incluidos los casos límite: `0`, `11111111`, vacío, 9 bits y caracteres inválidos. |
-| **RNF-07** | **Seguridad de transporte y de contenido** | En producción, cliente y API se sirven por HTTPS. El cliente trata la entrada y las respuestas siempre como texto (`interpolación JSX`, nunca `dangerouslySetInnerHTML`). Los mensajes de error no exponen información interna del servidor. |
+| **RNF-07** | **Seguridad de contenido** | El cliente trata la entrada y las respuestas siempre como texto (`interpolación JSX`, nunca `dangerouslySetInnerHTML`). Los mensajes de error no exponen información interna del servidor. |
 | **RNF-08** | **Separación de capas** | El layout y la manipulación del DOM se resuelven solo en el cliente React (componentes, CSS y JavaScript); el procesamiento de negocio ocurre solo en Java. |
 
 ---
@@ -120,16 +125,20 @@ La herramienta está dirigida a estudiantes de computación, matemáticas y púb
 ### 5.1  Interfaz de usuario
 La pantalla principal es minimalista e incluye:
 * Un encabezado que identifica el propósito de la herramienta.
-* Un `<input>` de texto centrado, con su `<label>` asociada (RF-01, RNF-04).
-* Un botón "Convertir" (RF-02, RF-05).
+* Un `<input>` de texto con su `<label>` asociada y un texto de ayuda debajo (RF-01, RNF-04).
+* Un botón "Convertir", junto al `<input>` (RF-02, RF-05).
+* Un contenedor de visibilidad dinámica, debajo del `<input>`, para advertencias de validación y errores (RF-04, RF-10, RF-12).
+* Un visor de bits con 8 botones, uno por posición (de 7 a 0). Cada botón muestra su posición, la potencia de 2, su valor decimal y su estado (`0` o `1`). El visor y el `<input>` están sincronizados en ambos sentidos (RF-15, RF-16):
+  * Al escribir en el `<input>`, el visor refleja la cadena completada con ceros a la izquierda hasta 8 bits.
+  * Al pulsar un bit, este alterna entre `0` y `1`, y el `<input>` se actualiza con la cadena completa de 8 dígitos, incluidos los ceros a la izquierda (ej. `101` → pulsar el bit 7 → `10000101`).
+  * Los botones se deshabilitan mientras hay una conversión en curso y exponen su estado a los lectores de pantalla (`aria-pressed`) (RNF-04).
 * Un área tipográfica destacada para el número decimal final (RF-09).
-* Un contenedor de visibilidad dinámica para advertencias de validación y errores (RF-04, RF-10, RF-12).
 
 ### 5.2 Interfaces de software
 El cliente React consume la API del servidor con la función `fetch` del navegador. El servidor es una aplicación Spring Boot 4.x que se ejecuta en Java 21 o superior. No hay otras integraciones.
 
 ### 5.3 Interfaces de comunicaciones
-Protocolo HTTP (HTTPS en producción), formato JSON codificado en UTF-8. El servidor escucha por defecto en el puerto 8080 y aplica la política CORS de RNF-03. Las peticiones del cliente tienen un tiempo de espera de 3 s (RF-10).
+Protocolo HTTP, formato JSON codificado en UTF-8. El servidor escucha por defecto en el puerto 8080 y aplica la política CORS de RNF-03. Las peticiones del cliente tienen un tiempo de espera de 3 s (RF-10).
 
 ### 5.4 API de comunicación
 
@@ -161,7 +170,7 @@ Respuestas de error. Todas usan el formato `{"errorCode": "...", "message": "...
 
 ## 6. Criterios de Aceptación y Casos de Prueba
 
-El sistema se acepta cuando los 21 casos siguientes pasan. Cada requisito funcional tiene al menos una prueba. Los casos de interfaz se ejecutan en el navegador; los de API, con `curl` o una herramienta equivalente.
+El sistema se acepta cuando los 26 casos siguientes pasan. Cada requisito funcional tiene al menos una prueba. Los casos de interfaz se ejecutan en el navegador; los de API, con `curl` o una herramienta equivalente.
 
 | ID Prueba | Descripción / Requisito | Entrada (UI / API) | Salida Esperada | Requisitos |
 | :--- | :--- | :--- | :--- | :--- |
@@ -186,6 +195,11 @@ El sistema se acepta cuando los 21 casos siguientes pasan. Cada requisito funcio
 | **CP-19** | Servidor apagado | Servidor detenido; `101` + "Convertir" | La UI muestra "Servidor no disponible en este momento.". | RF-10 |
 | **CP-20** | Error 500 | API simulada que responde 500 con `ERR_INTERNAL` | La UI muestra "Servidor no disponible en este momento.". | RF-10, RF-14 |
 | **CP-21** | Tiempo de espera | API simulada que responde con más de 3 s de retraso | A los 3 s la UI muestra "Servidor no disponible en este momento.". | RF-10 |
+| **CP-22** | El visor refleja la entrada | Teclear `101` | El visor muestra `00000101`: los bits 2 y 0 en `1` y el resto en `0`. | RF-15 |
+| **CP-23** | Edición bit a bit | Campo vacío; pulsar los bits 3, 1 y 0 y luego "Convertir" | El campo queda en `00001011` y la UI muestra `11`. | RF-16, RF-09 |
+| **CP-24** | Relleno a 8 dígitos | Después de CP-07 (campo `101` con advertencia), pulsar el bit 7 | El campo queda en `10000101` y la advertencia desaparece. | RF-16, RF-04 |
+| **CP-25** | El visor borra el resultado | Convertir `11` (la UI muestra `3`) y pulsar el bit 0 | El campo queda en `00000010` y el resultado vuelve a `-`. | RF-16 |
+| **CP-26** | Visor durante la conversión | API simulada que responde con 2 s de retraso; `101` + "Convertir" | Los 8 bits están deshabilitados hasta que llega la respuesta. | RF-16 |
 
 ---
 
@@ -199,6 +213,7 @@ El sistema se acepta cuando los 21 casos siguientes pasan. Cada requisito funcio
 | CU-02 Entrada inválida en la UI | RF-03, RF-04, RF-05, RF-13 | CP-06 a CP-11 |
 | CU-03 Falla de red o servidor | RF-10 | CP-19, CP-20, CP-21 |
 | CU-04 Consumo directo de la API | RF-06a, RF-06b, RF-06c, RF-11, RF-14 | CP-12 a CP-17 |
+| CU-05 Edición bit a bit | RF-15, RF-16 | CP-22 a CP-26 |
 | Sin caso de uso (respuesta 400 inesperada en la UI) | RF-12 | CP-18 |
 
 ### 7.2 Requisitos no funcionales y verificación
@@ -209,10 +224,10 @@ El sistema se acepta cuando los 21 casos siguientes pasan. Cada requisito funcio
 | RNF-02 Rendimiento | PNF-02 | Prueba de carga (JMeter, k6 u otra) con 1,000 peticiones válidas tras 100 de calentamiento; el percentil 95 debe ser de 300 ms o menos. |
 | RNF-03 CORS | PNF-03 | Petición con un origen permitido (la respuesta incluye `Access-Control-Allow-Origin`) y con un origen no listado (el navegador la bloquea); revisión de la configuración. |
 | RNF-04 Accesibilidad | PNF-04 | Auditoría con Lighthouse o axe, medición de contraste, recorrido completo con la tecla `Tab` y prueba con un lector de pantalla. |
-| RNF-05 Compatibilidad | PNF-05 | Ejecutar CP-01 a CP-11 en las dos últimas versiones de Chrome, Firefox, Edge y Safari. |
+| RNF-05 Compatibilidad | PNF-05 | Ejecutar CP-01 a CP-11 y CP-22 a CP-25 en las dos últimas versiones de Chrome, Firefox, Edge y Safari. |
 | RNF-06 Pruebas | PNF-06 | Ejecución de pruebas unitarias con JUnit para los casos de conversión, validación y límites definidos en RNF-06. |
-| RNF-07 Seguridad de transporte y de contenido | PNF-07 | Revisión de que el cliente no usa `dangerouslySetInnerHTML`, comprobación de HTTPS en el despliegue y de que una respuesta 500 no incluye trazas. |
-| RNF-08 Separación de capas | PNF-08 | Revisión de código: sin lógica de conversión en JavaScript ni manipulación del DOM en Java. |
+| RNF-07 Seguridad de contenido | PNF-07 | Revisión de que el cliente no usa `dangerouslySetInnerHTML` y comprobación de que una respuesta 500 no incluye trazas. |
+| RNF-08 Separación de capas | PNF-08 | Revisión de código: sin lógica de conversión en JavaScript (el visor de bits solo muestra el peso de cada posición, no suma el resultado) ni manipulación del DOM en Java. |
 
 ---
 
